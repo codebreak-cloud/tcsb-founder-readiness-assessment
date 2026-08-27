@@ -12,7 +12,7 @@ React.createElement('p',{style:{fontSize:'var(--fs-body-lg)',lineHeight:'var(--l
 "You've built a serious career. You're good at your job, maybe the best in the room most days. And somewhere in the last few years, you've started asking yourself a different question: ",
 React.createElement('span',{style:{background:'var(--yellow-tint-10)',boxShadow:'inset 0 -2px 0 var(--yellow)',padding:'0 4px',fontWeight:700}},'is this it?')
 ),
-React.createElement('p',{style:{fontSize:'var(--fs-body-lg)',lineHeight:'var(--lh-body)',color:'var(--text-secondary)',textAlign:'center',margin:0}},"Maybe it's still just a job that's stopped being enough. Maybe a restructuring has already put the decision in front of you before you were ready. Either way, you've probably told yourself the reason you haven't moved is time, or money, or timing. This is here to find out if that's actually true.")
+React.createElement('p',{style:{fontSize:'var(--fs-body-lg)',lineHeight:'var(--lh-body)',color:'var(--text-secondary)',textAlign:'center',margin:0}},"Maybe it's realising you've climbed as high as this job goes, and it still isn't enough. Maybe a restructuring has already put the decision in front of you before you were ready. Either way, you've probably told yourself the reason you haven't moved is time, or money, or nerve. This will show you if that's actually true.")
 );
 }
 // Counts up from 0 to finalValue the moment it scrolls into view, the same

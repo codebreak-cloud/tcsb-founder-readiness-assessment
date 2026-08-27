@@ -15,7 +15,7 @@ function HowItWorks(){
 const {Section}=window;
 return React.createElement(Section,{eyebrow:'How It Works',narrow:false},
 React.createElement('div',{style:{display:'flex',gap:40,flexWrap:'wrap',justifyContent:'center'}},
-React.createElement(Step,{n:1,icon:'dots',text:'Answer a handful of quick questions, mostly a single tap, one or two just a number, nothing that needs writing.',delay:0}),
+React.createElement(Step,{n:1,icon:'dots',text:'Answer a handful of quick questions, no war and peace.',delay:0}),
 React.createElement(Step,{n:2,icon:'ring',text:"Get your Founder Readiness Score and your result straight away, the specific thing that's been in your way and how you'll actually move past it.",delay:120}),
 React.createElement(Step,{n:3,icon:'arrow',text:'See what a real next step looks like for someone in exactly your position.',delay:240})
 )
