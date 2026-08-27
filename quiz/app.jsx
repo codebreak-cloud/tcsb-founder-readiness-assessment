@@ -161,11 +161,25 @@ function DetailsGate({ onSubmit, onBack }) {
   );
 }
 
+// The shared Callout uses --surface-sunken (grey) internally, which is fine
+// on the white pages it was designed for but blends into this page now that
+// the page itself is that same grey. This local variant is white instead,
+// scoped to just this page rather than changing the shared component.
+function ResultCallout({ children, accent = 'var(--yellow)' }) {
+  return React.createElement('div', {
+    style: {
+      display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 20px', borderRadius: 'var(--radius-md)',
+      background: '#fff', border: '1px solid var(--border-default)', borderLeft: `3px solid ${accent}`,
+      fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--navy)', fontWeight: 700,
+    },
+  }, children);
+}
+
 // ---------------------------------------------------------------------------
 // Result page
 // ---------------------------------------------------------------------------
 function ResultPage({ result, lead }) {
-  const { ScoreDial, ResultCard, Callout, Button } = window.TCSBDesignSystem_000d09;
+  const { ScoreDial, ResultCard, Button } = window.TCSBDesignSystem_000d09;
   const tone = SEGMENT_TONES[result.tone];
   const blocker = BLOCKERS[result.blocker];
   const style = DECISION_STYLES[result.decisionStyle];
@@ -199,7 +213,7 @@ function ResultPage({ result, lead }) {
 
       React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-body)', textAlign: 'center', margin: 0 } }, blocker.bridge),
 
-      React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement(Callout, null, 'Cohort 1 starts end of October and is capped at 20 people.')),
+      React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement(ResultCallout, null, 'Cohort 1 starts end of October and is capped at 20 people.')),
 
       React.createElement('div', { style: { background: '#fff', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', padding: 24, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' } },
         React.createElement('div', { style: { width: '100%', aspectRatio: '16/9', background: 'var(--surface-sunken)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center', padding: 16 } }, `▶ Video placeholder — Lisa on ${blocker.title} (60–90s)`),
