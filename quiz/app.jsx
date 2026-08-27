@@ -189,7 +189,7 @@ function DetailsGate({ onSubmit, onBack }) {
     React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 24 } },
       React.createElement('h2', { style: { fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h4)', color: 'var(--navy)', lineHeight: 'var(--lh-heading)', margin: 0, textAlign: 'center' } }, 'Enter your details to see your full result, including your Founder Readiness Score.'),
       React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 16 } },
-        React.createElement(TextField, { label: 'Name', value: name, onChange: setName, error: touched && name.trim().length <= 1 ? 'Enter your name' : undefined }),
+        React.createElement(TextField, { label: 'Full Name', value: name, onChange: setName, error: touched && name.trim().length <= 1 ? 'Enter your name' : undefined }),
         React.createElement(TextField, { label: 'Email', type: 'email', value: email, onChange: setEmail, error: touched && !emailValid ? 'Enter a valid email' : undefined }),
         React.createElement(TextField, { label: 'Mobile number', type: 'tel', value: mobile, onChange: setMobile, error: touched && mobile.trim().length < 7 ? 'Enter a mobile number' : undefined, helper: "We'll text you your result and, if it makes sense, let you know when spaces are close to full." }),
         React.createElement(Checkbox, { checked: consent, onChange: setConsent },
