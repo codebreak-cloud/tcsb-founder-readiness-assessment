@@ -8,3 +8,8 @@
 
 .tcsb-number-input::-webkit-outer-spin-button,.tcsb-number-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .tcsb-number-input{-moz-appearance:textfield;}
+
+/* Two columns once there's room for both cards to breathe; wraps back to a
+   single column on narrow phone widths rather than needing a media query. */
+.tcsb-result-cards{display:flex;flex-wrap:wrap;gap:24px;}
+.tcsb-result-cards > div{flex:1 1 220px;min-width:0;}

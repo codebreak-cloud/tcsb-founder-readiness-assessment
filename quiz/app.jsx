@@ -276,16 +276,17 @@ function ResultPage({ result, lead }) {
       };
 
   return React.createElement('div', { style: { background: 'var(--surface-sunken)', minHeight: '100vh', fontFamily: 'var(--font-body)' } },
-    React.createElement('div', { style: { maxWidth: 560, margin: '0 auto', padding: '40px 24px 80px', display: 'flex', flexDirection: 'column', gap: 48 } },
+    React.createElement('div', { style: { maxWidth: 640, margin: '0 auto', padding: '40px 24px 80px', display: 'flex', flexDirection: 'column', gap: 48 } },
 
       React.createElement('div', { className: 'tcsb-card-hover', style: { background: 'var(--navy)', borderRadius: 'var(--radius-lg)', padding: '40px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 } },
         React.createElement(ScoreDial, { value: result.readinessScore, size: 200, color: 'var(--yellow)', label: 'Founder Readiness Score', numeralColor: '#fff', labelColor: 'rgba(255,255,255,.75)' }),
         React.createElement('p', { style: { color: 'rgba(255,255,255,.75)', fontSize: 14, textAlign: 'center', margin: 0, maxWidth: 340 } }, tone.line)
       ),
 
-      React.createElement('div', { className: 'tcsb-card-hover' }, React.createElement(ResultCard, { eyebrow: 'Your blocker', title: blocker.title, body: blocker.body, accent: 'var(--orange)' })),
-
-      React.createElement('div', { className: 'tcsb-card-hover' }, React.createElement(ResultCard, { eyebrow: 'Your decision style', title: style.title, body: style.body, accent: 'var(--pink)', shareable: true })),
+      React.createElement('div', { className: 'tcsb-result-cards' },
+        React.createElement('div', { className: 'tcsb-card-hover' }, React.createElement(ResultCard, { eyebrow: 'Your blocker', title: blocker.title, body: blocker.body, accent: 'var(--orange)' })),
+        React.createElement('div', { className: 'tcsb-card-hover' }, React.createElement(ResultCard, { eyebrow: 'Your decision style', title: style.title, body: style.body, accent: 'var(--pink)', shareable: true }))
+      ),
 
       React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-body)', textAlign: 'center', margin: 0 } }, `What this would really get you: ${whyNowLine}.`),
 
