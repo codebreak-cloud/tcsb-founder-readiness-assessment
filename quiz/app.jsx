@@ -151,9 +151,9 @@ function DetailsGate({ onSubmit, onBack }) {
       React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 16 } },
         React.createElement(TextField, { label: 'Name', value: name, onChange: setName, error: touched && name.trim().length <= 1 ? 'Enter your name' : undefined }),
         React.createElement(TextField, { label: 'Email', type: 'email', value: email, onChange: setEmail, error: touched && !emailValid ? 'Enter a valid email' : undefined }),
-        React.createElement(TextField, { label: 'Mobile number', type: 'tel', value: mobile, onChange: setMobile, error: touched && mobile.trim().length < 7 ? 'Enter a mobile number' : undefined, helper: "We'll text you your result and, if it makes sense, let you know when Cohort 1 spaces are close to full." }),
+        React.createElement(TextField, { label: 'Mobile number', type: 'tel', value: mobile, onChange: setMobile, error: touched && mobile.trim().length < 7 ? 'Enter a mobile number' : undefined, helper: "We'll text you your result and, if it makes sense, let you know when spaces are close to full." }),
         React.createElement(Checkbox, { checked: consent, onChange: setConsent },
-          "I'm happy for TCSB to text and email me about my result and Cohort 1. ",
+          "I'm happy for The Contemporary School of Business to text and email me about my result and future cohorts. ",
           React.createElement('em', null, '(Placeholder wording — needs sign-off from TCSB’s legal/compliance process before this goes live, per the blueprint’s open decisions.)')
         )
       ),
