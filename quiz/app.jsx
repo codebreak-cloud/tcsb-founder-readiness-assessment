@@ -181,7 +181,7 @@ function ResultPage({ result, lead }) {
         button: 'Join The Waitlist',
       };
 
-  return React.createElement('div', { style: { background: '#fff', fontFamily: 'var(--font-body)' } },
+  return React.createElement('div', { style: { background: 'var(--surface-sunken)', minHeight: '100vh', fontFamily: 'var(--font-body)' } },
     React.createElement('div', { style: { maxWidth: 560, margin: '0 auto', padding: '40px 24px 80px', display: 'flex', flexDirection: 'column', gap: 48 } },
 
       React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement('img', { src: '../assets/logos/logo-dark-orange.png', alt: 'TCSB', style: { height: 64 } })),
@@ -201,12 +201,12 @@ function ResultPage({ result, lead }) {
 
       React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement(Callout, null, 'Cohort 1 starts end of October and is capped at 20 people.')),
 
-      React.createElement('div', { style: { border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', padding: 24, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' } },
+      React.createElement('div', { style: { background: '#fff', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', padding: 24, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' } },
         React.createElement('div', { style: { width: '100%', aspectRatio: '16/9', background: 'var(--surface-sunken)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center', padding: 16 } }, `▶ Video placeholder — Lisa on ${blocker.title} (60–90s)`),
         React.createElement('span', { style: { fontSize: 12, color: 'var(--text-secondary)' } }, 'One version per blocker — not yet produced')
       ),
 
-      React.createElement('div', { style: { background: 'var(--surface-sunken)', borderRadius: 'var(--radius-lg)', padding: 32, display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', textAlign: 'center' } },
+      React.createElement('div', { style: { background: '#fff', borderRadius: 'var(--radius-lg)', padding: 32, display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', textAlign: 'center' } },
         React.createElement('p', { style: { fontSize: 'var(--fs-body-lg)', color: 'var(--navy)', lineHeight: 'var(--lh-body)', margin: 0 } }, cta.line),
         React.createElement(Button, {
           variant: 'primary', fullWidth: true,
