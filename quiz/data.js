@@ -79,7 +79,7 @@ const QUESTIONS = [
       { value: 'B', label: '"I can\'t afford to get this wrong financially"', blocker: 'runwayFear' },
       { value: 'C', label: '"I wouldn\'t even know who my first client would be"', blocker: 'noClientPath' },
       { value: 'D', label: '"There aren\'t enough hours in the day"', blocker: 'noRoomYet' },
-      { value: 'E', label: '"Who am I to call myself a founder"', blocker: 'permissionGap' },
+      { value: 'E', label: '"I don\'t feel confident enough to be the one in charge"', blocker: 'permissionGap' },
     ],
   },
   {
