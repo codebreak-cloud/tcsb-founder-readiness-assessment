@@ -8,10 +8,15 @@ const { QUESTIONS, SEGMENT_TONES, BLOCKERS, DECISION_STYLES, WHY_NOW, scoreQuiz 
 const SHELL_BG = 'linear-gradient(160deg,#0a0a3d,#000031 55%,#1c1c4d)';
 
 function DarkBackLink({ onClick }) {
+  const [hover, setHover] = React.useState(false);
   return React.createElement('button', {
-    type: 'button', onClick, style: {
-      display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer',
-      color: 'rgba(255,255,255,.72)', fontFamily: 'var(--font-body)', fontSize: 14, padding: 8,
+    type: 'button', onClick, onMouseEnter: () => setHover(true), onMouseLeave: () => setHover(false),
+    style: {
+      display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+      background: hover ? 'rgba(255,255,255,.14)' : 'rgba(255,255,255,.06)',
+      border: '1px solid var(--border-inverse)', borderRadius: 'var(--radius-pill)',
+      color: '#fff', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 700,
+      padding: '8px 16px 8px 12px', transition: 'background-color var(--dur-fast) var(--ease-standard)',
     },
   },
     React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none' }, React.createElement('path', { d: 'M15 18l-6-6 6-6', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' })),
