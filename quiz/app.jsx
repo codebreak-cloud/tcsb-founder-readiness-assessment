@@ -89,8 +89,43 @@ function ScaleRow({ min = 1, max = 10, value, onChange, minLabel, maxLabel }) {
 // ---------------------------------------------------------------------------
 // Question — one component handles all three answer formats (mc/scale/number).
 // ---------------------------------------------------------------------------
+// NumberField — the design system's NumberInput only supports the +/- stepper
+// buttons, with a read-only display in between. This variant keeps the same
+// stepper but makes the number itself a real input, so people can type a
+// value directly instead of clicking one at a time.
+function NumberField({ value, min = 0, max = 40, suffix, onChange }) {
+  const clamp = (n) => Math.max(min, Math.min(max, n));
+  const [text, setText] = React.useState(String(value ?? min));
+  React.useEffect(() => { setText(String(value ?? min)); }, [value]);
+  const commit = (raw) => {
+    const parsed = parseInt(raw, 10);
+    const next = Number.isFinite(parsed) ? clamp(parsed) : (value ?? min);
+    setText(String(next));
+    onChange && onChange(next);
+  };
+  return React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 16, fontFamily: 'var(--font-body)' } },
+    React.createElement('button', {
+      type: 'button', onClick: () => commit((value ?? min) - 1),
+      style: { width: 44, height: 44, borderRadius: '50%', border: '1px solid var(--border-strong)', background: '#fff', fontSize: 20, cursor: 'pointer', color: 'var(--navy)' },
+    }, '−'),
+    React.createElement('div', { style: { minWidth: 110, textAlign: 'center', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: '12px 16px' } },
+      React.createElement('input', {
+        type: 'number', inputMode: 'numeric', min, max, value: text, className: 'tcsb-number-input',
+        onChange: (e) => setText(e.target.value),
+        onBlur: (e) => commit(e.target.value),
+        style: { width: 48, border: 'none', outline: 'none', background: 'transparent', fontSize: 32, fontWeight: 700, color: 'var(--navy)', fontFamily: 'var(--font-body)', textAlign: 'center', padding: 0 },
+      }),
+      suffix && React.createElement('span', { style: { fontSize: 14, color: 'var(--text-secondary)', marginLeft: 6 } }, suffix)
+    ),
+    React.createElement('button', {
+      type: 'button', onClick: () => commit((value ?? min) + 1),
+      style: { width: 44, height: 44, borderRadius: '50%', border: '1px solid var(--border-strong)', background: '#fff', fontSize: 20, cursor: 'pointer', color: 'var(--navy)' },
+    }, '+')
+  );
+}
+
 function Question({ question, index, total, value, onAnswer, onBack }) {
-  const { OptionButton, NumberInput, Button } = window.TCSBDesignSystem_000d09;
+  const { OptionButton, Button } = window.TCSBDesignSystem_000d09;
   const [draft, setDraft] = React.useState(value);
   React.useEffect(() => { setDraft(value); }, [question.id]);
 
@@ -124,7 +159,7 @@ function Question({ question, index, total, value, onAnswer, onBack }) {
   return React.createElement(QuizChrome, { current: index + 1, total, onBack },
     React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center', textAlign: 'center' } },
       React.createElement('h2', { style: { fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h4)', color: 'var(--navy)', lineHeight: 'var(--lh-heading)', margin: 0 } }, question.text),
-      React.createElement(NumberInput, { value: v, min: question.min, max: question.max, suffix: question.suffix, onChange: setDraft }),
+      React.createElement(NumberField, { value: v, min: question.min, max: question.max, suffix: question.suffix, onChange: setDraft }),
       React.createElement('div', { style: { width: '100%' } }, React.createElement(Button, { variant: 'primary', fullWidth: true, onClick: () => onAnswer(v) }, 'Continue'))
     )
   );
