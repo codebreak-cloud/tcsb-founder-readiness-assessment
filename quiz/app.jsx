@@ -43,6 +43,7 @@ function QuizChrome({ current, total, onBack, children }) {
     ),
     React.createElement('div', { style: { flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '20px 24px 56px' } },
       React.createElement('div', {
+        className: 'tcsb-card-hover',
         style: {
           maxWidth: 520, width: '100%', background: '#fff', borderRadius: 'var(--radius-lg)',
           padding: '40px 32px', boxShadow: '0 24px 64px rgba(0,0,10,.35), 0 4px 12px rgba(0,0,10,.18)',
@@ -198,16 +199,14 @@ function ResultPage({ result, lead }) {
   return React.createElement('div', { style: { background: 'var(--surface-sunken)', minHeight: '100vh', fontFamily: 'var(--font-body)' } },
     React.createElement('div', { style: { maxWidth: 560, margin: '0 auto', padding: '40px 24px 80px', display: 'flex', flexDirection: 'column', gap: 48 } },
 
-      React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement('img', { src: '../assets/logos/logo-dark-orange.png', alt: 'TCSB', style: { height: 64 } })),
-
-      React.createElement('div', { style: { background: 'var(--navy)', borderRadius: 'var(--radius-lg)', padding: '40px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 } },
+      React.createElement('div', { className: 'tcsb-card-hover', style: { background: 'var(--navy)', borderRadius: 'var(--radius-lg)', padding: '40px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 } },
         React.createElement(ScoreDial, { value: result.readinessScore, size: 200, color: 'var(--yellow)', label: 'Founder Readiness Score', numeralColor: '#fff', labelColor: 'rgba(255,255,255,.75)' }),
         React.createElement('p', { style: { color: 'rgba(255,255,255,.75)', fontSize: 14, textAlign: 'center', margin: 0, maxWidth: 340 } }, tone.line)
       ),
 
-      React.createElement(ResultCard, { eyebrow: 'Your blocker', title: blocker.title, body: blocker.body, accent: 'var(--orange)' }),
+      React.createElement('div', { className: 'tcsb-card-hover' }, React.createElement(ResultCard, { eyebrow: 'Your blocker', title: blocker.title, body: blocker.body, accent: 'var(--orange)' })),
 
-      React.createElement(ResultCard, { eyebrow: 'Your decision style', title: style.title, body: style.body, accent: 'var(--pink)', shareable: true }),
+      React.createElement('div', { className: 'tcsb-card-hover' }, React.createElement(ResultCard, { eyebrow: 'Your decision style', title: style.title, body: style.body, accent: 'var(--pink)', shareable: true })),
 
       React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-body)', textAlign: 'center', margin: 0 } }, `What this would really get you: ${whyNowLine}.`),
 
@@ -215,12 +214,12 @@ function ResultPage({ result, lead }) {
 
       React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement(ResultCallout, null, 'Cohort 1 starts end of October and is capped at 20 people.')),
 
-      React.createElement('div', { style: { background: '#fff', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', padding: 24, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' } },
+      React.createElement('div', { className: 'tcsb-card-hover', style: { background: '#fff', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', padding: 24, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' } },
         React.createElement('div', { style: { width: '100%', aspectRatio: '16/9', background: 'var(--surface-sunken)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center', padding: 16 } }, `▶ Video placeholder — Lisa on ${blocker.title} (60–90s)`),
         React.createElement('span', { style: { fontSize: 12, color: 'var(--text-secondary)' } }, 'One version per blocker — not yet produced')
       ),
 
-      React.createElement('div', { style: { background: '#fff', borderRadius: 'var(--radius-lg)', padding: 32, display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', textAlign: 'center' } },
+      React.createElement('div', { className: 'tcsb-card-hover', style: { background: '#fff', borderRadius: 'var(--radius-lg)', padding: 32, display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', textAlign: 'center' } },
         React.createElement('p', { style: { fontSize: 'var(--fs-body-lg)', color: 'var(--navy)', lineHeight: 'var(--lh-body)', margin: 0 } }, cta.line),
         React.createElement(Button, {
           variant: 'primary', fullWidth: true,

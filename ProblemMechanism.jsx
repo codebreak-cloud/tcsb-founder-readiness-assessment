@@ -15,12 +15,32 @@ React.createElement('span',{style:{background:'var(--yellow-tint-10)',boxShadow:
 React.createElement('p',{style:{fontSize:'var(--fs-body-lg)',lineHeight:'var(--lh-body)',color:'var(--text-secondary)',textAlign:'center',margin:0}},"Maybe it's still just a job that's stopped being enough. Maybe a restructuring has already put the decision in front of you before you were ready. Either way, you've probably told yourself the reason you haven't moved is time, or money, or timing. This is here to find out if that's actually true.")
 );
 }
+// Counts up from 0 to finalValue the moment it scrolls into view, the same
+// way the score dial animates in on the result page — rather than firing
+// immediately on page load regardless of scroll position.
+function ScoreDialOnScroll({finalValue,...rest}){
+const {ScoreDial}=window.TCSBDesignSystem_000d09;
+const ref=React.useRef(null);
+const [value,setValue]=React.useState(0);
+React.useEffect(()=>{
+const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduced){setValue(finalValue);return;}
+const el=ref.current;
+if(!el)return;
+const obs=new IntersectionObserver(([entry])=>{
+if(entry.isIntersecting){setValue(finalValue);obs.disconnect();}
+},{threshold:0.4});
+obs.observe(el);
+return ()=>obs.disconnect();
+},[]);
+return React.createElement('div',{ref},React.createElement(ScoreDial,{...rest,value}));
+}
 function MechanismSection(){
-const {ScoreDial,Icon}=window.TCSBDesignSystem_000d09;
+const {Icon}=window.TCSBDesignSystem_000d09;
 return React.createElement(Section,{eyebrow:'The Mechanism',bg:'var(--surface-sunken)'},
 React.createElement('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:40}},
 React.createElement('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:8}},
-React.createElement(ScoreDial,{value:72,size:160,color:'var(--orange)',label:'Founder Readiness Score'}),
+React.createElement(ScoreDialOnScroll,{finalValue:72,size:160,color:'var(--orange)',label:'Founder Readiness Score'}),
 React.createElement('span',{style:{fontSize:12,color:'var(--text-secondary)'}},'Preview — your score is revealed at the end')
 ),
 React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:20}},

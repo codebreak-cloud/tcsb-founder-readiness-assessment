@@ -2,3 +2,6 @@
 @import "tokens/typography.css";
 @import "tokens/spacing.css";
 @import "tokens/fonts.css";
+
+.tcsb-card-hover{transition:transform var(--dur-base) var(--ease-standard), box-shadow var(--dur-base) var(--ease-standard);}
+.tcsb-card-hover:hover{transform:translateY(-4px);box-shadow:var(--shadow-elevated);}
