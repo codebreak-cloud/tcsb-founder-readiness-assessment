@@ -41,7 +41,7 @@ function DarkProgressBar({ current, total }) {
 function QuizChrome({ current, total, onBack, children }) {
   return React.createElement('div', { style: { minHeight: '100vh', background: SHELL_BG, display: 'flex', flexDirection: 'column', fontFamily: 'var(--font-body)' } },
     React.createElement('div', { style: { padding: '24px 24px 0', display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 560, width: '100%', margin: '0 auto' } },
-      onBack && React.createElement('div', { style: { display: 'flex', justifyContent: 'flex-end' } },
+      onBack && React.createElement('div', { style: { display: 'flex', justifyContent: 'flex-start' } },
         React.createElement(DarkBackLink, { onClick: onBack })
       ),
       current && total && React.createElement(DarkProgressBar, { current, total })
