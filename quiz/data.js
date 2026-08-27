@@ -62,7 +62,7 @@ const QUESTIONS = [
   },
   {
     id: 'q6', type: 'mc', block: 'B',
-    text: "An hour with someone who's already done this. First question?",
+    text: "You have an hour with someone who's already done this. What's your first question?",
     options: [
       { value: 'A', label: 'How do I turn this into a plan?', blocker: 'noPlanYet' },
       { value: 'B', label: 'How do I not go backwards financially?', blocker: 'runwayFear' },
