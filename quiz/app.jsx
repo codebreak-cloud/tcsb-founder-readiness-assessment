@@ -216,6 +216,29 @@ function ResultCallout({ children, accent = 'var(--yellow)' }) {
   }, children);
 }
 
+// A slim bar pinned to the bottom of the viewport once the reader has
+// scrolled past the hero but hasn't reached the real CTA card yet, so the
+// action is never more than a thumb's reach away. Hides again once the real
+// card comes into view (or before the reader has scrolled at all), so
+// there's never two competing "Join The Waitlist" buttons on screen.
+function StickyCTA({ visible, label, onClick }) {
+  const { Button } = window.TCSBDesignSystem_000d09;
+  return React.createElement('div', {
+    style: {
+      position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40,
+      transform: visible ? 'translateY(0)' : 'translateY(110%)',
+      transition: 'transform var(--dur-base) var(--ease-standard)',
+      background: '#fff', borderTop: '1px solid var(--border-default)',
+      boxShadow: '0 -8px 24px rgba(0,0,10,.14)',
+      padding: '12px 16px calc(12px + env(safe-area-inset-bottom, 0px))',
+    },
+  },
+    React.createElement('div', { style: { maxWidth: 520, margin: '0 auto' } },
+      React.createElement(Button, { variant: 'primary', fullWidth: true, onClick }, label)
+    )
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Result page
 // ---------------------------------------------------------------------------
@@ -225,6 +248,22 @@ function ResultPage({ result, lead }) {
   const blocker = BLOCKERS[result.blocker];
   const style = DECISION_STYLES[result.decisionStyle];
   const whyNowLine = WHY_NOW[result.whyNow];
+
+  const ctaRef = React.useRef(null);
+  const [stickyVisible, setStickyVisible] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => {
+      const el = ctaRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      setStickyVisible(window.scrollY > 320 && top > window.innerHeight);
+    };
+    check();
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => { window.removeEventListener('scroll', check); window.removeEventListener('resize', check); };
+  }, []);
+  const handleCtaClick = () => alert('Placeholder — no waitlist destination is wired up yet. Point this at the real signup form/link when it exists.');
 
   const cta = result.highReadiness
     ? {
@@ -259,14 +298,18 @@ function ResultPage({ result, lead }) {
         React.createElement('span', { style: { fontSize: 12, color: 'var(--text-secondary)' } }, 'One version per blocker — not yet produced')
       ),
 
-      React.createElement('div', { className: 'tcsb-card-hover', style: { background: '#fff', borderRadius: 'var(--radius-lg)', padding: 32, display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', textAlign: 'center' } },
-        React.createElement('p', { style: { fontSize: 'var(--fs-body-lg)', color: 'var(--navy)', lineHeight: 'var(--lh-body)', margin: 0 } }, cta.line),
+      React.createElement('div', {
+        ref: ctaRef, className: 'tcsb-card-hover',
+        style: { background: 'var(--navy)', borderTop: '4px solid var(--orange)', borderRadius: 'var(--radius-lg)', padding: 36, display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', textAlign: 'center' },
+      },
+        React.createElement('p', { style: { fontSize: 'var(--fs-h5)', fontWeight: 700, color: '#fff', lineHeight: 'var(--lh-heading)', margin: 0, maxWidth: 420 } }, cta.line),
         React.createElement(Button, {
           variant: 'primary', fullWidth: true,
-          onClick: () => alert('Placeholder — no waitlist destination is wired up yet. Point this at the real signup form/link when it exists.'),
+          onClick: handleCtaClick,
         }, cta.button)
       )
-    )
+    ),
+    React.createElement(StickyCTA, { visible: stickyVisible, label: cta.button, onClick: handleCtaClick })
   );
 }
 
