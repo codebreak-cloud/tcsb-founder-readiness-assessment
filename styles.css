@@ -3,6 +3,11 @@
 @import "tokens/spacing.css";
 @import "tokens/fonts.css";
 
+/* Without this, any element combining width:100% with padding renders
+   wider than its parent, causing horizontal overflow on narrow phones. */
+*,*::before,*::after{box-sizing:border-box;}
+html,body{overflow-x:hidden;max-width:100%;}
+
 .tcsb-card-hover{transition:transform var(--dur-base) var(--ease-standard), box-shadow var(--dur-base) var(--ease-standard);}
 .tcsb-card-hover:hover{transform:translateY(-4px);box-shadow:var(--shadow-elevated);}
 

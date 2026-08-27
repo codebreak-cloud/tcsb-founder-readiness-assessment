@@ -278,7 +278,7 @@ function ResultPage({ result, lead }) {
   return React.createElement('div', { style: { background: 'var(--surface-sunken)', minHeight: '100vh', fontFamily: 'var(--font-body)' } },
     React.createElement('div', { style: { maxWidth: 640, margin: '0 auto', padding: '40px 24px 80px', display: 'flex', flexDirection: 'column', gap: 48 } },
 
-      React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement('img', { src: '../assets/logos/logo-dark-orange.png', alt: 'The Contemporary School of Business', style: { height: 72, objectFit: 'contain' } })),
+      React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement('img', { src: '../assets/logos/logo-dark-orange.png', alt: 'The Contemporary School of Business', style: { height: 100, objectFit: 'contain' } })),
 
       React.createElement('div', { className: 'tcsb-card-hover', style: { background: 'var(--navy)', borderRadius: 'var(--radius-lg)', padding: '40px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 } },
         React.createElement(ScoreDial, { value: result.readinessScore, size: 200, color: 'var(--yellow)', label: 'Founder Readiness Score', numeralColor: '#fff', labelColor: 'rgba(255,255,255,.75)' }),
