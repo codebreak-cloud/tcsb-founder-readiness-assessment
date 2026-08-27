@@ -66,9 +66,9 @@ const QUESTIONS = [
     options: [
       { value: 'A', label: 'How do I turn this into a plan?', blocker: 'noPlanYet' },
       { value: 'B', label: 'How do I not go backwards financially?', blocker: 'runwayFear' },
-      { value: 'C', label: 'How do I get a first client, no company behind me?', blocker: 'noClientPath' },
+      { value: 'C', label: 'How do I get my first client, no company behind me?', blocker: 'noClientPath' },
       { value: 'D', label: 'How did you actually find the time?', blocker: 'noRoomYet' },
-      { value: 'E', label: 'How did you know you were allowed to call yourself a founder?', blocker: 'permissionGap' },
+      { value: 'E', label: 'What made it finally click for you?', blocker: 'permissionGap' },
     ],
   },
   {
