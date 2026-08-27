@@ -106,8 +106,8 @@ const QUESTIONS = [
     id: 'q10', type: 'scale', block: 'C',
     text: 'If nothing changes in the next 12 months, how does that feel?',
     min: 1, max: 10,
-    minLabel: 'Completely fine with that',
-    maxLabel: "Genuinely can't sit with that",
+    minLabel: 'I am happy where I am',
+    maxLabel: 'Absolutely mortifying',
   },
   {
     id: 'q11', type: 'mc', block: 'D',
