@@ -111,12 +111,16 @@ const QUESTIONS = [
   },
   {
     id: 'q11', type: 'mc', block: 'D',
-    text: 'If this actually happened, what would it really get you?',
+    text: "Picture yourself running your own business. What's the one thing you'd want most out of it?",
     options: [
-      { value: 'A', label: 'Time back, control over my hours', whyNow: 'freedom' },
-      { value: 'B', label: 'No ceiling on what I earn', whyNow: 'uncapped' },
-      { value: 'C', label: 'Something solid before the next restructuring wave', whyNow: 'protection' },
-      { value: 'D', label: 'Something with my name on it', whyNow: 'legacy' },
+      { value: 'A', label: 'My time finally being my own again', whyNow: 'freedom' },
+      { value: 'B', label: 'Freedom, finally out of the rat race', whyNow: 'freedom' },
+      { value: 'C', label: 'My hard work finally driving what I earn, not a bonus my employer decides', whyNow: 'uncapped' },
+      { value: 'D', label: 'Not stuck on a salary, my earnings finally uncapped', whyNow: 'uncapped' },
+      { value: 'E', label: 'Not having to worry about redundancy', whyNow: 'protection' },
+      { value: 'F', label: 'Never being one restructuring away from starting over', whyNow: 'protection' },
+      { value: 'G', label: 'Something with my name on it that I can be proud of', whyNow: 'legacy' },
+      { value: 'H', label: "Working towards my own goals, not somebody else's", whyNow: 'legacy' },
     ],
   },
   {
