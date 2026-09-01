@@ -1,6 +1,11 @@
 (function () {
 const { QUESTIONS, SEGMENT_TONES, BLOCKERS, DECISION_STYLES, WHY_NOW, scoreQuiz } = window.TCSBQuizData;
 
+// GHL inbound webhook — every completed quiz lead is posted here, tagged
+// 'quizlead', with the full result written into a readable notes field so
+// it lands in the contact record without needing custom-field mapping.
+const GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/lJ0kzP8yu7nL0ZTfpelP/webhook-trigger/39af386c-8948-48ab-98b4-b46a9e6ba4bd';
+
 // The quiz shell sits on the same dark navy gradient as the landing page
 // hero. Header controls (logo/back/progress) live directly on that dark
 // background, so they use light-friendly colors rather than the shared
@@ -352,19 +357,52 @@ function QuizApp() {
     const scored = scoreQuiz(answers, order);
     setResult(scored);
 
-    // TODO: wire this up to TCSB's real CRM/webhook once one exists.
     // Per blueprint section 7: Blocker, Decision Style, Why Now, Readiness
     // Score, seniority, years at level and hours available should all land
-    // per-lead in the CRM, and feed Lisa's pre-call brief and ad/email
-    // targeting. For now this just logs + keeps a local copy so nothing is
-    // silently lost during testing.
-    const payload = { ...leadData, ...scored, submittedAt: new Date().toISOString() };
-    console.log('[TCSB Quiz] Lead captured — send this to the CRM:', payload);
+    // per-lead in the CRM. Sent as a readable notes block (rather than
+    // relying on custom-field mapping in GHL) plus the raw fields too, so
+    // whoever sets up the workflow can map either.
+    const [firstName, ...restName] = leadData.name.trim().split(/\s+/);
+    const lastName = restName.join(' ');
+    const notes = [
+      `Founder Readiness Score: ${scored.readinessScore}`,
+      `Blocker: ${BLOCKERS[scored.blocker].title}`,
+      `Decision Style: ${DECISION_STYLES[scored.decisionStyle].title}`,
+      `Why Now: ${WHY_NOW[scored.whyNow]}`,
+      `Seniority: ${scored.seniority}`,
+      `Years at this level: ${scored.yearsAtLevel}`,
+      `Hours available per week: ${scored.hoursPerWeek}`,
+      `High readiness (CTA routing): ${scored.highReadiness ? 'Yes' : 'No'}`,
+    ].join('\n');
+
+    const payload = {
+      full_name: leadData.name, first_name: firstName, last_name: lastName,
+      email: leadData.email, phone: leadData.mobile,
+      tags: ['quizlead'],
+      notes,
+      readiness_score: scored.readinessScore,
+      blocker: scored.blocker,
+      decision_style: scored.decisionStyle,
+      why_now: scored.whyNow,
+      seniority: scored.seniority,
+      years_at_level: scored.yearsAtLevel,
+      hours_per_week: scored.hoursPerWeek,
+      high_readiness: scored.highReadiness,
+      submitted_at: new Date().toISOString(),
+    };
+
+    console.log('[TCSB Quiz] Lead captured — posting to GHL:', payload);
     try {
       const existing = JSON.parse(localStorage.getItem('tcsb_quiz_leads') || '[]');
       existing.push(payload);
       localStorage.setItem('tcsb_quiz_leads', JSON.stringify(existing));
     } catch (e) { /* localStorage unavailable — non-fatal */ }
+
+    fetch(GHL_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch((err) => console.error('[TCSB Quiz] GHL webhook failed:', err));
 
     setScreen('result');
   };
