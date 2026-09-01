@@ -6,6 +6,10 @@ const { QUESTIONS, SEGMENT_TONES, BLOCKERS, DECISION_STYLES, WHY_NOW, scoreQuiz 
 // it lands in the contact record without needing custom-field mapping.
 const GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/lJ0kzP8yu7nL0ZTfpelP/webhook-trigger/39af386c-8948-48ab-98b4-b46a9e6ba4bd';
 
+// Codebreak tracking webhook — separate from the GHL lead-capture webhook
+// above; fired alongside it on every submission, purely for tracking.
+const TRACKING_WEBHOOK_URL = 'https://ai.codebreak.co.uk/api/webhook/e95ebc14-4e00-43da-ae3a-9c76ae6c6c4f/600bb307-dd8d-4d5c-9c4d-cb8712990c72';
+
 // The quiz shell sits on the same dark navy gradient as the landing page
 // hero. Header controls (logo/back/progress) live directly on that dark
 // background, so they use light-friendly colors rather than the shared
@@ -403,6 +407,12 @@ function QuizApp() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }).catch((err) => console.error('[TCSB Quiz] GHL webhook failed:', err));
+
+    fetch(TRACKING_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch((err) => console.error('[TCSB Quiz] Tracking webhook failed:', err));
 
     setScreen('result');
   };
