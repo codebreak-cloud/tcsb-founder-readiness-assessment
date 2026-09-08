@@ -4,24 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The Founder Readiness Assessment — TCSB</title>
-<!-- Meta Pixel -->
+<!-- Meta Pixel + Codebreak Hub: gated behind cookie consent, see CookieBanner below -->
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '927381333738831');
-fbq('track', 'PageView');
+window.__tcsbLoadTrackers = function () {
+  if (window.__tcsbTrackersLoaded) return;
+  window.__tcsbTrackersLoaded = true;
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '927381333738831');
+  fbq('track', 'PageView');
+  var hub = document.createElement('script');
+  hub.async = true;
+  hub.src = 'https://ai.codebreak.co.uk/api/hub/v1/cmt1mvuym0021lb04j17uca0a';
+  document.head.appendChild(hub);
+};
+try {
+  if (localStorage.getItem('tcsb_cookie_consent') === 'accepted') window.__tcsbLoadTrackers();
+} catch (e) {}
 </script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=927381333738831&ev=PageView&noscript=1"
-/></noscript>
-<!-- Codebreak Hub -->
-<script async src="https://ai.codebreak.co.uk/api/hub/v1/cmt1mvuym0021lb04j17uca0a"></script>
 <link rel="stylesheet" href="../styles.css?v=4">
 <style>
   body { margin: 0; }
@@ -36,9 +42,50 @@ src="https://www.facebook.com/tr?id=927381333738831&ev=PageView&noscript=1"
 <body>
 <div id="root"></div>
 <script src="data.js?v=7"></script>
-<script type="text/babel" src="app.jsx?v=8"></script>
+<script type="text/babel" src="app.jsx?v=9"></script>
 <script type="text/babel">
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.QuizApp));
+function CookieBanner() {
+  const [visible, setVisible] = React.useState(false);
+  React.useEffect(() => {
+    try { if (!localStorage.getItem('tcsb_cookie_consent')) setVisible(true); } catch (e) { setVisible(true); }
+  }, []);
+  if (!visible) return null;
+  const { Button } = window.TCSBDesignSystem_000d09;
+  const decide = (value) => {
+    try { localStorage.setItem('tcsb_cookie_consent', value); } catch (e) {}
+    if (value === 'accepted' && window.__tcsbLoadTrackers) window.__tcsbLoadTrackers();
+    setVisible(false);
+  };
+  return React.createElement('div', {
+    style: {
+      position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 200,
+      background: '#fff', borderTop: '1px solid var(--border-default)',
+      boxShadow: '0 -8px 24px rgba(0,0,10,.14)', fontFamily: 'var(--font-body)',
+      padding: '20px 20px calc(20px + env(safe-area-inset-bottom, 0px))',
+    },
+  },
+    React.createElement('div', {
+      style: { maxWidth: 720, margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' },
+    },
+      React.createElement('p', { style: { margin: 0, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, flex: '1 1 320px' } },
+        'We use cookies, including the Meta Pixel, to run this site and see how our ads are performing. See our ',
+        React.createElement('a', { href: '../assets/legal/tcsb-privacy-policy.pdf', target: '_blank', rel: 'noopener' }, 'Privacy Policy'),
+        ' for details.'
+      ),
+      React.createElement('div', { style: { display: 'flex', gap: 8, flex: '0 0 auto' } },
+        React.createElement(Button, { variant: 'secondary', size: 'sm', onClick: () => decide('rejected') }, 'Reject'),
+        React.createElement(Button, { variant: 'primary', size: 'sm', onClick: () => decide('accepted') }, 'Accept All')
+      )
+    )
+  );
+}
+function App() {
+  return React.createElement(React.Fragment, null,
+    React.createElement(window.QuizApp),
+    React.createElement(CookieBanner)
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 </script>
 </body>
 </html>
