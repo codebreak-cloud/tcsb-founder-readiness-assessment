@@ -248,6 +248,45 @@ function StickyCTA({ visible, label, onClick }) {
   );
 }
 
+// Confirmation shown after "Join The Waitlist" — no real signup destination
+// is wired up yet (see handleCtaClick), so this is the only feedback the
+// reader gets that their click did something.
+function WaitlistModal({ onClose }) {
+  const { Button } = window.TCSBDesignSystem_000d09;
+  return React.createElement('div', {
+    style: {
+      position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(10,10,30,.6)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+    },
+    onClick: onClose,
+  },
+    React.createElement('div', {
+      className: 'tcsb-card-hover',
+      style: {
+        background: '#fff', borderTop: '4px solid var(--orange)', borderRadius: 'var(--radius-lg)',
+        padding: '40px 32px', maxWidth: 420, width: '100%', textAlign: 'center',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+      },
+      onClick: (e) => e.stopPropagation(),
+    },
+      React.createElement('div', {
+        style: {
+          width: 48, height: 48, borderRadius: '50%', background: 'var(--yellow)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 22, fontWeight: 700, color: 'var(--navy)',
+        },
+      }, '✓'),
+      React.createElement('h3', {
+        style: { fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h5)', color: 'var(--navy)', margin: 0 },
+      }, "You're on the waitlist"),
+      React.createElement('p', {
+        style: { fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-body)', margin: 0 },
+      }, "You're all set — keep an eye on your inbox, as we'll email you as soon as the date for our next webinar is confirmed."),
+      React.createElement(Button, { variant: 'primary', fullWidth: true, onClick: onClose }, 'Got it')
+    )
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Result page
 // ---------------------------------------------------------------------------
@@ -272,7 +311,8 @@ function ResultPage({ result, lead }) {
     window.addEventListener('resize', check);
     return () => { window.removeEventListener('scroll', check); window.removeEventListener('resize', check); };
   }, []);
-  const handleCtaClick = () => alert('Placeholder — no waitlist destination is wired up yet. Point this at the real signup form/link when it exists.');
+  const [showWaitlistModal, setShowWaitlistModal] = React.useState(false);
+  const handleCtaClick = () => setShowWaitlistModal(true);
 
   const cta = result.highReadiness
     ? {
@@ -305,11 +345,6 @@ function ResultPage({ result, lead }) {
 
       React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement(ResultCallout, null, 'Cohort 1 starts end of October and is capped at 20 people.')),
 
-      React.createElement('div', { className: 'tcsb-card-hover', style: { background: '#fff', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', padding: 24, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' } },
-        React.createElement('div', { style: { width: '100%', aspectRatio: '16/9', background: 'var(--surface-sunken)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center', padding: 16 } }, `▶ Video placeholder — Lisa on ${blocker.title} (60–90s)`),
-        React.createElement('span', { style: { fontSize: 12, color: 'var(--text-secondary)' } }, 'One version per blocker — not yet produced')
-      ),
-
       React.createElement('div', {
         ref: ctaRef, className: 'tcsb-card-hover',
         style: { background: 'var(--navy)', borderTop: '4px solid var(--orange)', borderRadius: 'var(--radius-lg)', padding: 36, display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', textAlign: 'center' },
@@ -321,7 +356,8 @@ function ResultPage({ result, lead }) {
         }, cta.button)
       )
     ),
-    React.createElement(StickyCTA, { visible: stickyVisible, label: cta.button, onClick: handleCtaClick })
+    React.createElement(StickyCTA, { visible: stickyVisible, label: cta.button, onClick: handleCtaClick }),
+    showWaitlistModal && React.createElement(WaitlistModal, { onClose: () => setShowWaitlistModal(false) })
   );
 }
 
