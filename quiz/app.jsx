@@ -382,7 +382,7 @@ function QuizApp() {
     const payload = {
       full_name: leadData.name, first_name: firstName, last_name: lastName,
       email: leadData.email, phone: leadData.mobile,
-      tags: ['quizlead'],
+      tags: ['quizlead', `${scored.blocker.toLowerCase()}-result`],
       notes,
       readiness_score: scored.readinessScore,
       blocker: scored.blocker,
