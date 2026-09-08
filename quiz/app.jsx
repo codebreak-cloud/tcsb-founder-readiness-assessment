@@ -204,8 +204,7 @@ function DetailsGate({ onSubmit, onBack }) {
         React.createElement(Checkbox, { checked: consent, onChange: setConsent },
           "I'm happy for The Contemporary School of Business to text and email me about my result and future cohorts. See our ",
           React.createElement('a', { href: '../assets/legal/tcsb-privacy-policy.pdf', target: '_blank', rel: 'noopener' }, 'Privacy Policy'),
-          ' for how we handle your details. ',
-          React.createElement('em', null, '(Consent wording — needs sign-off from TCSB’s legal/compliance process before this goes live, per the blueprint’s open decisions.)')
+          ' for how we handle your details.'
         )
       ),
       React.createElement(Button, { variant: 'primary', fullWidth: true, onClick: submit }, 'Send')
