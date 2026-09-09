@@ -14,7 +14,7 @@ React.createElement('span',{style:{borderBottom:'4px solid var(--pink)'}},'Your 
 '?'
 ),
 React.createElement('p',{style:{fontSize:'clamp(15px,3.6vw,var(--fs-body-lg))',lineHeight:'var(--lh-body)',color:'rgba(255,255,255,.78)',margin:'0 0 24px'}},"Built specially for corporate leaders and managers aged 40+ who've wondered if they could run their own business. Find out exactly what's been in your way, how ready you actually are, and what to do next."),
-React.createElement(Button,{variant:'primary',onClick:()=>window.location.href='quiz/index.html'},'Start The Assessment')
+React.createElement(Button,{variant:'primary',onClick:()=>window.location.href='quiz/'},'Start The Assessment')
 )
 );
 }
