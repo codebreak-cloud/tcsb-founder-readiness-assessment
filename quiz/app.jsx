@@ -340,21 +340,23 @@ function ResultPage({ result, lead }) {
         React.createElement('div', { className: 'tcsb-card-hover' }, React.createElement(ResultCard, { eyebrow: 'Your decision style', title: style.title, body: style.body, accent: 'var(--pink)', shareable: true }))
       ),
 
-      React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-body)', textAlign: 'center', margin: 0 } }, `What this would really get you: ${whyNowLine}.`),
-
-      React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-body)', textAlign: 'center', margin: 0 } }, blocker.bridge),
-
-      React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement(ResultCallout, null, 'Cohort 1 starts end of October and is capped at 20 people.')),
-
       React.createElement('div', {
         ref: ctaRef, className: 'tcsb-card-hover',
-        style: { background: 'var(--navy)', borderTop: '4px solid var(--orange)', borderRadius: 'var(--radius-lg)', padding: 36, display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', textAlign: 'center' },
+        style: { background: 'var(--navy)', borderTop: '4px solid var(--orange)', borderRadius: 'var(--radius-lg)', padding: 36, display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'stretch', textAlign: 'center' },
       },
-        React.createElement('p', { style: { fontSize: 'var(--fs-h5)', fontWeight: 700, color: '#fff', lineHeight: 'var(--lh-heading)', margin: 0, maxWidth: 420 } }, cta.line),
-        React.createElement(Button, {
-          variant: 'primary', fullWidth: true,
-          onClick: handleCtaClick,
-        }, cta.button)
+        React.createElement('h3', { style: { fontSize: 'var(--fs-h5)', fontWeight: 700, color: '#fff', lineHeight: 'var(--lh-heading)', margin: 0 } }, 'Next step: how to turn this into a business plan.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'Now you know your Blocker and your Decision Style, the next step is seeing exactly how to turn that into a real business plan.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'Indecision is the thief of opportunity. Even if your decision is to stay exactly where you are, this masterclass will help you get there.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0, fontWeight: 700 } }, 'Join The Founder You Already Are: How To Build A Real Business Plan In 90 Days, a free live masterclass on Zoom, Monday 5th October.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'Zoom caps how many people can join live, and spaces are going. If you\'re seeing this, you can still secure yours.'),
+        React.createElement('a', {
+          href: 'https://go.thecontemporaryschoolofbusiness.com/webinar-waitlist-page',
+          style: { display: 'inline-block' },
+        },
+          React.createElement(Button, {
+            variant: 'primary', fullWidth: true,
+          }, 'Save My Free Spot')
+        )
       )
     ),
     React.createElement(StickyCTA, { visible: stickyVisible, label: cta.button, onClick: handleCtaClick }),
