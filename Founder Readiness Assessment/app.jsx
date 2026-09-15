@@ -1,0 +1,472 @@
+(function () {
+const { QUESTIONS, SEGMENT_TONES, BLOCKERS, DECISION_STYLES, WHY_NOW, scoreQuiz } = window.TCSBQuizData;
+
+// GHL inbound webhook — every completed quiz lead is posted here, tagged
+// 'quizlead', with the full result written into a readable notes field so
+// it lands in the contact record without needing custom-field mapping.
+const GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/lJ0kzP8yu7nL0ZTfpelP/webhook-trigger/39af386c-8948-48ab-98b4-b46a9e6ba4bd';
+
+// Codebreak tracking webhook — separate from the GHL lead-capture webhook
+// above; fired alongside it on every submission, purely for tracking.
+const TRACKING_WEBHOOK_URL = 'https://ai.codebreak.co.uk/api/webhook/e95ebc14-4e00-43da-ae3a-9c76ae6c6c4f/600bb307-dd8d-4d5c-9c4d-cb8712990c72';
+
+// The quiz shell sits on the same dark navy gradient as the landing page
+// hero. Header controls (logo/back/progress) live directly on that dark
+// background, so they use light-friendly colors rather than the shared
+// DS BackLink/ProgressBar (which are tuned for a white page).
+const SHELL_BG = 'linear-gradient(160deg,#0a0a3d,#000031 55%,#1c1c4d)';
+
+function DarkBackLink({ onClick }) {
+  const [hover, setHover] = React.useState(false);
+  return React.createElement('button', {
+    type: 'button', onClick, onMouseEnter: () => setHover(true), onMouseLeave: () => setHover(false),
+    style: {
+      display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+      background: hover ? 'rgba(255,255,255,.14)' : 'rgba(255,255,255,.06)',
+      border: '1px solid var(--border-inverse)', borderRadius: 'var(--radius-pill)',
+      color: '#fff', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 700,
+      padding: '8px 16px 8px 12px', transition: 'background-color var(--dur-fast) var(--ease-standard)',
+    },
+  },
+    React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none' }, React.createElement('path', { d: 'M15 18l-6-6 6-6', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' })),
+    'Back'
+  );
+}
+
+function DarkProgressBar({ current, total }) {
+  const pct = Math.round((current / total) * 100);
+  return React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 8, fontFamily: 'var(--font-body)' } },
+    React.createElement('span', { style: { fontSize: 13, color: 'rgba(255,255,255,.72)', fontWeight: 700 } }, `Question ${current} of ${total}`),
+    React.createElement('div', { style: { height: 6, borderRadius: 'var(--radius-pill)', background: 'rgba(255,255,255,.14)', overflow: 'hidden' } },
+      React.createElement('div', { style: { height: '100%', width: pct + '%', background: 'var(--pink)', borderRadius: 'var(--radius-pill)', transition: 'width var(--dur-slow) var(--ease-standard)' } })
+    )
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Chrome — dark shell (logo, back link, progress bar) with each question
+// lifted onto a white card so it reads clearly against the dark background.
+// ---------------------------------------------------------------------------
+function QuizChrome({ current, total, onBack, children }) {
+  return React.createElement('div', { style: { minHeight: '100vh', background: SHELL_BG, display: 'flex', flexDirection: 'column', fontFamily: 'var(--font-body)' } },
+    React.createElement('div', { style: { padding: '24px 24px 0', display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 560, width: '100%', margin: '0 auto' } },
+      onBack && React.createElement('div', { style: { display: 'flex', justifyContent: 'flex-start' } },
+        React.createElement(DarkBackLink, { onClick: onBack })
+      ),
+      current && total && React.createElement(DarkProgressBar, { current, total })
+    ),
+    React.createElement('div', { style: { flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '20px 24px 56px' } },
+      React.createElement('div', {
+        className: 'tcsb-card-hover',
+        style: {
+          maxWidth: 520, width: '100%', background: '#fff', borderRadius: 'var(--radius-lg)',
+          padding: '40px 32px', boxShadow: '0 24px 64px rgba(0,0,10,.35), 0 4px 12px rgba(0,0,10,.18)',
+        },
+      }, children)
+    )
+  );
+}
+
+// ScaleRow — the design system's ScaleInput wraps onto two lines once there
+// are more than ~9 items in a narrow container (as on Q10, which has 10).
+// This variant fits every option on a single row at any width by sizing
+// each circle as a flex share of the row instead of a fixed 44px.
+function ScaleRow({ min = 1, max = 10, value, onChange, minLabel, maxLabel }) {
+  const nums = [];
+  for (let i = min; i <= max; i++) nums.push(i);
+  return React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 16, fontFamily: 'var(--font-body)' } },
+    React.createElement('div', { style: { display: 'flex', gap: 6, width: '100%' } },
+      nums.map(n => {
+        const sel = n === value;
+        return React.createElement('button', {
+          key: n, type: 'button', onClick: () => onChange && onChange(n), style: {
+            flex: '1 1 0', minWidth: 0, aspectRatio: '1 / 1', borderRadius: '50%',
+            border: sel ? 'none' : '1px solid var(--border-strong)',
+            background: sel ? 'var(--pink)' : '#fff', color: sel ? '#fff' : 'var(--navy)',
+            fontWeight: 700, fontSize: 'clamp(11px, 3.6vw, 15px)', padding: 0,
+            cursor: 'pointer', transition: 'background-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard)',
+          },
+        }, n);
+      })
+    ),
+    React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-secondary)' } },
+      React.createElement('span', null, minLabel), React.createElement('span', null, maxLabel)
+    )
+  );
+}
+
+// NumberField — the design system's NumberInput only supports the +/- stepper
+// buttons, with a read-only display in between. This variant keeps the same
+// stepper but makes the number itself a real input, so people can type a
+// value directly instead of clicking one at a time.
+function NumberField({ value, min = 0, max = 40, suffix, onChange }) {
+  const clamp = (n) => Math.max(min, Math.min(max, n));
+  const [text, setText] = React.useState(String(value ?? min));
+  React.useEffect(() => { setText(String(value ?? min)); }, [value]);
+  const commit = (raw) => {
+    const parsed = parseInt(raw, 10);
+    const next = Number.isFinite(parsed) ? clamp(parsed) : (value ?? min);
+    setText(String(next));
+    onChange && onChange(next);
+  };
+  return React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 16, fontFamily: 'var(--font-body)' } },
+    React.createElement('button', {
+      type: 'button', onClick: () => commit((value ?? min) - 1),
+      style: { width: 44, height: 44, borderRadius: '50%', border: '1px solid var(--border-strong)', background: '#fff', fontSize: 20, cursor: 'pointer', color: 'var(--navy)' },
+    }, '−'),
+    React.createElement('div', { style: { minWidth: 110, textAlign: 'center', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: '12px 16px' } },
+      React.createElement('input', {
+        type: 'number', inputMode: 'numeric', min, max, value: text, className: 'tcsb-number-input',
+        onChange: (e) => setText(e.target.value),
+        onBlur: (e) => commit(e.target.value),
+        style: { width: 48, border: 'none', outline: 'none', background: 'transparent', fontSize: 32, fontWeight: 700, color: 'var(--navy)', fontFamily: 'var(--font-body)', textAlign: 'center', padding: 0 },
+      }),
+      suffix && React.createElement('span', { style: { fontSize: 14, color: 'var(--text-secondary)', marginLeft: 6 } }, suffix)
+    ),
+    React.createElement('button', {
+      type: 'button', onClick: () => commit((value ?? min) + 1),
+      style: { width: 44, height: 44, borderRadius: '50%', border: '1px solid var(--border-strong)', background: '#fff', fontSize: 20, cursor: 'pointer', color: 'var(--navy)' },
+    }, '+')
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Question — one component handles all three answer formats (mc/scale/number).
+// ---------------------------------------------------------------------------
+function Question({ question, index, total, value, onAnswer, onBack }) {
+  const { OptionButton, Button } = window.TCSBDesignSystem_000d09;
+  const [draft, setDraft] = React.useState(value);
+  React.useEffect(() => { setDraft(value); }, [question.id]);
+
+  if (question.type === 'mc') {
+    const pick = (val) => { setDraft(val); setTimeout(() => onAnswer(val), 400); };
+    return React.createElement(QuizChrome, { current: index + 1, total, onBack },
+      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 24 } },
+        React.createElement('h2', { style: { fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h4)', color: 'var(--navy)', lineHeight: 'var(--lh-heading)', margin: 0 } }, question.text),
+        React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 10 } },
+          question.options.map(opt => React.createElement(OptionButton, {
+            key: opt.value, label: opt.label, selected: draft === opt.value, onClick: () => pick(opt.value),
+          }))
+        )
+      )
+    );
+  }
+
+  if (question.type === 'scale') {
+    const v = draft ?? Math.round((question.min + question.max) / 2);
+    return React.createElement(QuizChrome, { current: index + 1, total, onBack },
+      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 32 } },
+        React.createElement('h2', { style: { fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h4)', color: 'var(--navy)', lineHeight: 'var(--lh-heading)', margin: 0 } }, question.text),
+        React.createElement(ScaleRow, { min: question.min, max: question.max, value: v, onChange: setDraft, minLabel: question.minLabel, maxLabel: question.maxLabel }),
+        React.createElement(Button, { variant: 'primary', fullWidth: true, onClick: () => onAnswer(v) }, 'Continue')
+      )
+    );
+  }
+
+  // number
+  const v = draft ?? question.min;
+  return React.createElement(QuizChrome, { current: index + 1, total, onBack },
+    React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center', textAlign: 'center' } },
+      React.createElement('h2', { style: { fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h4)', color: 'var(--navy)', lineHeight: 'var(--lh-heading)', margin: 0 } }, question.text),
+      React.createElement(NumberField, { value: v, min: question.min, max: question.max, suffix: question.suffix, onChange: setDraft }),
+      React.createElement('div', { style: { width: '100%' } }, React.createElement(Button, { variant: 'primary', fullWidth: true, onClick: () => onAnswer(v) }, 'Continue'))
+    )
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Details gate — name / email / mobile, required before the result unlocks.
+// ---------------------------------------------------------------------------
+function DetailsGate({ onSubmit, onBack }) {
+  const { TextField, Checkbox, Button } = window.TCSBDesignSystem_000d09;
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [mobile, setMobile] = React.useState('');
+  const [consent, setConsent] = React.useState(false);
+  const [touched, setTouched] = React.useState(false);
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const canSubmit = name.trim().length > 1 && emailValid && mobile.trim().length >= 7 && consent;
+
+  const submit = () => {
+    setTouched(true);
+    if (!canSubmit) return;
+    onSubmit({ name: name.trim(), email: email.trim(), mobile: mobile.trim() });
+  };
+
+  return React.createElement(QuizChrome, { onBack },
+    React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 24 } },
+      React.createElement('h2', { style: { fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h4)', color: 'var(--navy)', lineHeight: 'var(--lh-heading)', margin: 0, textAlign: 'center' } }, 'Enter your details to see your full result, including your Founder Readiness Score.'),
+      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 16 } },
+        React.createElement(TextField, { label: 'Full Name', value: name, onChange: setName, error: touched && name.trim().length <= 1 ? 'Enter your name' : undefined }),
+        React.createElement(TextField, { label: 'Email', type: 'email', value: email, onChange: setEmail, error: touched && !emailValid ? 'Enter a valid email' : undefined }),
+        React.createElement(TextField, { label: 'Mobile number', type: 'tel', value: mobile, onChange: setMobile, error: touched && mobile.trim().length < 7 ? 'Enter a mobile number' : undefined, helper: "We'll text you your result and, if it makes sense, let you know when spaces are close to full." }),
+        React.createElement(Checkbox, { checked: consent, onChange: setConsent },
+          "I'm happy for The Contemporary School of Business to text and email me about my result and future cohorts. See our ",
+          React.createElement('a', { href: 'assets/legal/tcsb-privacy-policy.pdf', target: '_blank', rel: 'noopener' }, 'Privacy Policy'),
+          ' for how we handle your details.'
+        )
+      ),
+      React.createElement(Button, { variant: 'primary', fullWidth: true, onClick: submit }, 'Send')
+    )
+  );
+}
+
+// The shared Callout uses --surface-sunken (grey) internally, which is fine
+// on the white pages it was designed for but blends into this page now that
+// the page itself is that same grey. This local variant is white instead,
+// scoped to just this page rather than changing the shared component.
+function ResultCallout({ children, accent = 'var(--yellow)' }) {
+  return React.createElement('div', {
+    style: {
+      display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 20px', borderRadius: 'var(--radius-md)',
+      background: '#fff', border: '1px solid var(--border-default)', borderLeft: `3px solid ${accent}`,
+      fontFamily: 'var(--font-body)', fontSize: 'var(--fs-body-sm)', color: 'var(--navy)', fontWeight: 700,
+    },
+  }, children);
+}
+
+// A slim bar pinned to the bottom of the viewport once the reader has
+// scrolled past the hero but hasn't reached the real CTA card yet, so the
+// action is never more than a thumb's reach away. Hides again once the real
+// card comes into view (or before the reader has scrolled at all), so
+// there's never two competing "Join The Waitlist" buttons on screen.
+function StickyCTA({ visible, label, onClick }) {
+  const { Button } = window.TCSBDesignSystem_000d09;
+  return React.createElement('div', {
+    style: {
+      position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40,
+      transform: visible ? 'translateY(0)' : 'translateY(110%)',
+      transition: 'transform var(--dur-base) var(--ease-standard)',
+      background: '#fff', borderTop: '1px solid var(--border-default)',
+      boxShadow: '0 -8px 24px rgba(0,0,10,.14)',
+      padding: '12px 16px calc(12px + env(safe-area-inset-bottom, 0px))',
+    },
+  },
+    React.createElement('div', { style: { maxWidth: 520, margin: '0 auto' } },
+      React.createElement(Button, { variant: 'primary', fullWidth: true, onClick }, label)
+    )
+  );
+}
+
+// Confirmation shown after "Join The Waitlist" — no real signup destination
+// is wired up yet (see handleCtaClick), so this is the only feedback the
+// reader gets that their click did something.
+function WaitlistModal({ onClose }) {
+  const { Button } = window.TCSBDesignSystem_000d09;
+  return React.createElement('div', {
+    style: {
+      position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(10,10,30,.6)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+    },
+    onClick: onClose,
+  },
+    React.createElement('div', {
+      className: 'tcsb-card-hover',
+      style: {
+        background: '#fff', borderTop: '4px solid var(--orange)', borderRadius: 'var(--radius-lg)',
+        padding: '40px 32px', maxWidth: 420, width: '100%', textAlign: 'center',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+      },
+      onClick: (e) => e.stopPropagation(),
+    },
+      React.createElement('div', {
+        style: {
+          width: 48, height: 48, borderRadius: '50%', background: 'var(--yellow)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 22, fontWeight: 700, color: 'var(--navy)',
+        },
+      }, '✓'),
+      React.createElement('h3', {
+        style: { fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h5)', color: 'var(--navy)', margin: 0 },
+      }, "You're on the waitlist"),
+      React.createElement('p', {
+        style: { fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-body)', margin: 0 },
+      }, "You're all set — keep an eye on your inbox, as we'll email you as soon as the date for our next webinar is confirmed."),
+      React.createElement(Button, { variant: 'primary', fullWidth: true, onClick: onClose }, 'Got it')
+    )
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Result page
+// ---------------------------------------------------------------------------
+function ResultPage({ result, lead }) {
+  const { ScoreDial, ResultCard, Button } = window.TCSBDesignSystem_000d09;
+  const tone = SEGMENT_TONES[result.tone];
+  const blocker = BLOCKERS[result.blocker];
+  const style = DECISION_STYLES[result.decisionStyle];
+  const whyNowLine = WHY_NOW[result.whyNow];
+
+  const ctaRef = React.useRef(null);
+  const [stickyVisible, setStickyVisible] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => {
+      const el = ctaRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      setStickyVisible(window.scrollY > 320 && top > window.innerHeight);
+    };
+    check();
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => { window.removeEventListener('scroll', check); window.removeEventListener('resize', check); };
+  }, []);
+  const [showWaitlistModal, setShowWaitlistModal] = React.useState(false);
+  const handleCtaClick = () => setShowWaitlistModal(true);
+
+  const cta = result.highReadiness
+    ? {
+        line: "You're ready to move on this now. Join the waitlist and you'll be first in line the moment Cohort 1 opens for applications.",
+        button: 'Join The Waitlist',
+      }
+    : {
+        line: "Here's your next step. Join the waitlist and you'll be the first to hear as soon as we're ready to show you more.",
+        button: 'Join The Waitlist',
+      };
+
+  return React.createElement('div', { style: { background: 'var(--surface-sunken)', minHeight: '100vh', fontFamily: 'var(--font-body)' } },
+    React.createElement('div', { style: { maxWidth: 640, margin: '0 auto', padding: '40px 24px 80px', display: 'flex', flexDirection: 'column', gap: 48 } },
+
+      React.createElement('div', { style: { display: 'flex', justifyContent: 'center' } }, React.createElement('img', { src: 'assets/logos/logo-dark-orange.png', alt: 'The Contemporary School of Business', style: { height: 100, objectFit: 'contain' } })),
+
+      React.createElement('div', { className: 'tcsb-card-hover', style: { background: 'var(--navy)', borderRadius: 'var(--radius-lg)', padding: '40px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 } },
+        React.createElement(ScoreDial, { value: result.readinessScore, size: 200, color: 'var(--yellow)', label: 'Founder Readiness Score', numeralColor: '#fff', labelColor: 'rgba(255,255,255,.75)' }),
+        React.createElement('p', { style: { color: 'rgba(255,255,255,.75)', fontSize: 14, textAlign: 'center', margin: 0, maxWidth: 340 } }, tone.line)
+      ),
+
+      React.createElement('div', { className: 'tcsb-result-cards' },
+        React.createElement('div', { className: 'tcsb-card-hover' }, React.createElement(ResultCard, { eyebrow: 'Your blocker', title: blocker.title, body: blocker.body, accent: 'var(--orange)' })),
+        React.createElement('div', { className: 'tcsb-card-hover' }, React.createElement(ResultCard, { eyebrow: 'Your decision style', title: style.title, body: style.body, accent: 'var(--pink)', shareable: true }))
+      ),
+
+      React.createElement('div', {
+        ref: ctaRef, className: 'tcsb-card-hover',
+        style: { background: 'var(--navy)', borderTop: '4px solid var(--orange)', borderRadius: 'var(--radius-lg)', padding: 36, display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'stretch', textAlign: 'center' },
+      },
+        React.createElement('h3', { style: { fontSize: 'var(--fs-h5)', fontWeight: 700, color: '#fff', lineHeight: 'var(--lh-heading)', margin: 0 } }, 'Next step: how to turn this into a business plan.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'Now you know your Blocker and your Decision Style, the next step is seeing exactly how to turn that into a real business plan.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'Indecision is the thief of opportunity. Even if your decision is to stay exactly where you are, this masterclass will help you get there.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0, fontWeight: 700 } }, 'Join The Founder You Already Are: How To Build A Real Business Plan In 90 Days, a free live masterclass on Zoom, Monday 5th October.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'Zoom caps how many people can join live, and spaces are going. If you\'re seeing this, you can still secure yours.'),
+        React.createElement('a', {
+          href: 'https://go.thecontemporaryschoolofbusiness.com/webinar-waitlist-page',
+          style: { display: 'inline-block' },
+        },
+          React.createElement(Button, {
+            variant: 'primary', fullWidth: true,
+          }, 'Save My Free Spot')
+        )
+      )
+    ),
+    React.createElement(StickyCTA, { visible: stickyVisible, label: cta.button, onClick: handleCtaClick }),
+    showWaitlistModal && React.createElement(WaitlistModal, { onClose: () => setShowWaitlistModal(false) })
+  );
+}
+
+// ---------------------------------------------------------------------------
+// App shell — owns quiz state, scoring, and lead capture.
+// ---------------------------------------------------------------------------
+function QuizApp() {
+  // Starts straight on Q1 — the landing page is the intro/framing step,
+  // so the quiz's own intro screen would just be a redundant white page
+  // between "Start The Assessment" and the first question.
+  const [screen, setScreen] = React.useState('q0'); // q0..q11 | gate | result
+  const [answers, setAnswers] = React.useState({});
+  const [order, setOrder] = React.useState([]);
+  const [lead, setLead] = React.useState(null);
+  const [result, setResult] = React.useState(null);
+
+  const qIndex = screen.startsWith('q') ? parseInt(screen.slice(1), 10) : -1;
+
+  const answer = (val) => {
+    const q = QUESTIONS[qIndex];
+    setAnswers(prev => ({ ...prev, [q.id]: val }));
+    setOrder(prev => prev.includes(q.id) ? prev : [...prev, q.id]);
+    if (qIndex < QUESTIONS.length - 1) {
+      setScreen('q' + (qIndex + 1));
+    } else {
+      setScreen('gate');
+    }
+  };
+
+  const back = () => {
+    if (screen === 'gate') { setScreen('q' + (QUESTIONS.length - 1)); return; }
+    if (qIndex > 0) { setScreen('q' + (qIndex - 1)); }
+  };
+
+  const submitLead = (leadData) => {
+    setLead(leadData);
+    const scored = scoreQuiz(answers, order);
+    setResult(scored);
+
+    // Per blueprint section 7: Blocker, Decision Style, Why Now, Readiness
+    // Score, seniority, years at level and hours available should all land
+    // per-lead in the CRM. Sent as a readable notes block (rather than
+    // relying on custom-field mapping in GHL) plus the raw fields too, so
+    // whoever sets up the workflow can map either.
+    const [firstName, ...restName] = leadData.name.trim().split(/\s+/);
+    const lastName = restName.join(' ');
+    const notes = [
+      `Founder Readiness Score: ${scored.readinessScore}`,
+      `Blocker: ${BLOCKERS[scored.blocker].title}`,
+      `Decision Style: ${DECISION_STYLES[scored.decisionStyle].title}`,
+      `Why Now: ${WHY_NOW[scored.whyNow]}`,
+      `Seniority: ${scored.seniority}`,
+      `Years at this level: ${scored.yearsAtLevel}`,
+      `Hours available per week: ${scored.hoursPerWeek}`,
+      `High readiness (CTA routing): ${scored.highReadiness ? 'Yes' : 'No'}`,
+    ].join('\n');
+
+    const payload = {
+      full_name: leadData.name, first_name: firstName, last_name: lastName,
+      email: leadData.email, phone: leadData.mobile,
+      tags: ['quizlead', `${scored.blocker.toLowerCase()}-result`],
+      notes,
+      readiness_score: scored.readinessScore,
+      blocker: scored.blocker,
+      decision_style: scored.decisionStyle,
+      why_now: scored.whyNow,
+      seniority: scored.seniority,
+      years_at_level: scored.yearsAtLevel,
+      hours_per_week: scored.hoursPerWeek,
+      high_readiness: scored.highReadiness,
+      submitted_at: new Date().toISOString(),
+    };
+
+    console.log('[TCSB Quiz] Lead captured — posting to GHL:', payload);
+    try {
+      const existing = JSON.parse(localStorage.getItem('tcsb_quiz_leads') || '[]');
+      existing.push(payload);
+      localStorage.setItem('tcsb_quiz_leads', JSON.stringify(existing));
+    } catch (e) { /* localStorage unavailable — non-fatal */ }
+
+    fetch(GHL_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch((err) => console.error('[TCSB Quiz] GHL webhook failed:', err));
+
+    fetch(TRACKING_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch((err) => console.error('[TCSB Quiz] Tracking webhook failed:', err));
+
+    setScreen('result');
+  };
+
+  if (screen === 'gate') return React.createElement(DetailsGate, { onSubmit: submitLead, onBack: back });
+  if (screen === 'result') return React.createElement(ResultPage, { result, lead });
+  if (qIndex >= 0) {
+    const q = QUESTIONS[qIndex];
+    return React.createElement(Question, {
+      question: q, index: qIndex, total: QUESTIONS.length,
+      value: answers[q.id], onAnswer: answer, onBack: qIndex > 0 ? back : undefined,
+    });
+  }
+  return null;
+}
+
+window.QuizApp = QuizApp;
+})();
