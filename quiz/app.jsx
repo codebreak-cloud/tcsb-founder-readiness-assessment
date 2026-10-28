@@ -230,8 +230,8 @@ function ResultCallout({ children, accent = 'var(--yellow)' }) {
 // scrolled past the hero but hasn't reached the real CTA card yet, so the
 // action is never more than a thumb's reach away. Hides again once the real
 // card comes into view (or before the reader has scrolled at all), so
-// there's never two competing "Join The Waitlist" buttons on screen.
-function StickyCTA({ visible, label, onClick }) {
+// there's never two competing "Watch The Masterclass" buttons on screen.
+function StickyCTA({ visible, label, href }) {
   const { Button } = window.TCSBDesignSystem_000d09;
   return React.createElement('div', {
     style: {
@@ -244,46 +244,9 @@ function StickyCTA({ visible, label, onClick }) {
     },
   },
     React.createElement('div', { style: { maxWidth: 520, margin: '0 auto' } },
-      React.createElement(Button, { variant: 'primary', fullWidth: true, onClick }, label)
-    )
-  );
-}
-
-// Confirmation shown after "Join The Waitlist" — no real signup destination
-// is wired up yet (see handleCtaClick), so this is the only feedback the
-// reader gets that their click did something.
-function WaitlistModal({ onClose }) {
-  const { Button } = window.TCSBDesignSystem_000d09;
-  return React.createElement('div', {
-    style: {
-      position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(10,10,30,.6)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
-    },
-    onClick: onClose,
-  },
-    React.createElement('div', {
-      className: 'tcsb-card-hover',
-      style: {
-        background: '#fff', borderTop: '4px solid var(--orange)', borderRadius: 'var(--radius-lg)',
-        padding: '40px 32px', maxWidth: 420, width: '100%', textAlign: 'center',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
-      },
-      onClick: (e) => e.stopPropagation(),
-    },
-      React.createElement('div', {
-        style: {
-          width: 48, height: 48, borderRadius: '50%', background: 'var(--yellow)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 22, fontWeight: 700, color: 'var(--navy)',
-        },
-      }, '✓'),
-      React.createElement('h3', {
-        style: { fontFamily: 'var(--font-display)', fontSize: 'var(--fs-h5)', color: 'var(--navy)', margin: 0 },
-      }, "You're on the waitlist"),
-      React.createElement('p', {
-        style: { fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-body)', margin: 0 },
-      }, "You're all set — keep an eye on your inbox, as we'll email you as soon as the date for our next webinar is confirmed."),
-      React.createElement(Button, { variant: 'primary', fullWidth: true, onClick: onClose }, 'Got it')
+      React.createElement('a', { href, style: { display: 'block' } },
+        React.createElement(Button, { variant: 'primary', fullWidth: true }, label)
+      )
     )
   );
 }
@@ -312,18 +275,7 @@ function ResultPage({ result, lead }) {
     window.addEventListener('resize', check);
     return () => { window.removeEventListener('scroll', check); window.removeEventListener('resize', check); };
   }, []);
-  const [showWaitlistModal, setShowWaitlistModal] = React.useState(false);
-  const handleCtaClick = () => setShowWaitlistModal(true);
-
-  const cta = result.highReadiness
-    ? {
-        line: "You're ready to move on this now. Join the waitlist and you'll be first in line the moment Cohort 1 opens for applications.",
-        button: 'Join The Waitlist',
-      }
-    : {
-        line: "Here's your next step. Join the waitlist and you'll be the first to hear as soon as we're ready to show you more.",
-        button: 'Join The Waitlist',
-      };
+  const replayUrl = 'https://go.thecontemporaryschoolofbusiness.com/webinar-replay';
 
   return React.createElement('div', { style: { background: 'var(--surface-sunken)', minHeight: '100vh', fontFamily: 'var(--font-body)' } },
     React.createElement('div', { style: { maxWidth: 640, margin: '0 auto', padding: '40px 24px 80px', display: 'flex', flexDirection: 'column', gap: 48 } },
@@ -347,20 +299,19 @@ function ResultPage({ result, lead }) {
         React.createElement('h3', { style: { fontSize: 'var(--fs-h5)', fontWeight: 700, color: '#fff', lineHeight: 'var(--lh-heading)', margin: 0 } }, 'Next step: how to turn this into a business plan.'),
         React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'Now you know your Blocker and your Decision Style, the next step is seeing exactly how to turn that into a real business plan.'),
         React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'Indecision is the thief of opportunity. Even if your decision is to stay exactly where you are, this masterclass will help you get there.'),
-        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0, fontWeight: 700 } }, 'Join The Founder You Already Are: How To Build A Real Business Plan In 90 Days, a free live masterclass on Zoom, Monday 26th October at 7pm.'),
-        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'Zoom caps how many people can join live, and spaces are going. If you\'re seeing this, you can still secure yours.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0, fontWeight: 700 } }, 'Watch The Founder You Already Are: How To Build A Real Business Plan In 90 Days, our free masterclass, now available on replay.'),
+        React.createElement('p', { style: { fontSize: 'var(--fs-body)', color: 'rgba(255,255,255,.85)', lineHeight: 'var(--lh-body)', margin: 0 } }, 'The live session has finished, but the full replay is ready for you to watch now.'),
         React.createElement('a', {
-          href: 'https://go.thecontemporaryschoolofbusiness.com/webinar-waitlist-page',
+          href: replayUrl,
           style: { display: 'inline-block' },
         },
           React.createElement(Button, {
             variant: 'primary', fullWidth: true,
-          }, 'Save My Free Spot')
+          }, 'Watch The Masterclass')
         )
       )
     ),
-    React.createElement(StickyCTA, { visible: stickyVisible, label: cta.button, onClick: handleCtaClick }),
-    showWaitlistModal && React.createElement(WaitlistModal, { onClose: () => setShowWaitlistModal(false) })
+    React.createElement(StickyCTA, { visible: stickyVisible, label: 'Watch The Masterclass', href: replayUrl }),
   );
 }
 
