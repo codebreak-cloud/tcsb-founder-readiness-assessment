@@ -369,7 +369,11 @@ function QuizApp() {
       `High readiness (CTA routing): ${scored.highReadiness ? 'Yes' : 'No'}`,
     ].join('\n');
 
+    let attribution = {};
+    try { attribution = JSON.parse(sessionStorage.getItem('tcsb_attribution') || '{}'); } catch (e) {}
+
     const payload = {
+      ...attribution,
       full_name: leadData.name, first_name: firstName, last_name: lastName,
       email: leadData.email, phone: leadData.mobile,
       tags: ['quizlead', `${scored.blocker.toLowerCase()}-result`],

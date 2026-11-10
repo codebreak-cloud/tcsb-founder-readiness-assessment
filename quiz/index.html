@@ -4,6 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The Founder Readiness Assessment — TCSB</title>
+<script>
+// Attribution capture: stash UTM / click-id params for the session so they
+// survive the landing page -> quiz/ navigation (which drops the query string).
+(function () {
+  try {
+    var keys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid','ttclid'];
+    var q = new URLSearchParams(location.search), found = {}, any = false;
+    keys.forEach(function (k) { if (q.get(k)) { found[k] = q.get(k); any = true; } });
+    if (any) {
+      found.landing_page = location.origin + location.pathname;
+      found.referrer = document.referrer || '';
+      sessionStorage.setItem('tcsb_attribution', JSON.stringify(found));
+    } else if (!sessionStorage.getItem('tcsb_attribution') && document.referrer) {
+      sessionStorage.setItem('tcsb_attribution', JSON.stringify({ referrer: document.referrer, landing_page: location.origin + location.pathname }));
+    }
+  } catch (e) {}
+})();
+</script>
 <!-- Meta Pixel + Codebreak Hub: gated behind cookie consent, see CookieBanner below -->
 <script>
 window.__tcsbLoadTrackers = function () {
@@ -42,7 +60,7 @@ try {
 <body>
 <div id="root"></div>
 <script src="data.js?v=7"></script>
-<script type="text/babel" src="app.jsx?v=10"></script>
+<script type="text/babel" src="app.jsx?v=11"></script>
 <script type="text/babel">
 function CookieBanner() {
   const [visible, setVisible] = React.useState(false);
